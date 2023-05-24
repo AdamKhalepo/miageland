@@ -1,5 +1,6 @@
 package com.miage.miageland_back.entities;
 
+import com.miage.miageland_back.TicketState;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -24,5 +25,7 @@ public class Ticket {
     private Visitor visitor;
 
     private double price;
+
+    private TicketState state;
 
 }
