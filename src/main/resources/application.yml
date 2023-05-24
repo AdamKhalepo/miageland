@@ -6,5 +6,7 @@ spring:
     driverClassName: org.h2.Driver
   jpa:
     spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+
 
 # http://localhost:8080/h2-console to access the db (username: sa, password: password)
