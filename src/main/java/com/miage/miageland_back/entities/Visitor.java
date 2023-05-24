@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Visiteur {
+public class Visitor {
     @Id
     private Long id;
 
-    private String nom;
+    private String name;
 
-    private String prenom;
+    private String firstName;
 
     private String email;
 }

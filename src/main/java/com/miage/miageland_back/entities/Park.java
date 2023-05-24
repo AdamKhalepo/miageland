@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Attraction {
+public class Park {
 
     @Id
-    private Long id;
+    private int id;
 
-    private String nom;
+    private int jaugeMax;
 
-    private boolean isOpen;
+    private int nbMaxJournalier;
 }

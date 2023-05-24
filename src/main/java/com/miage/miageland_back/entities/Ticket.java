@@ -12,17 +12,17 @@ import java.util.Date;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Billet {
+public class Ticket {
 
     @Id
     private Long id;
 
-    private Date dateVisite;
+    private Date visiteDate;
 
     @ManyToOne
-    @JoinColumn(name = "visiteur_id")
-    private Visiteur visiteur;
+    @JoinColumn(name = "visitor_id")
+    private Visitor visitor;
 
-    private double prix;
+    private double price;
 
 }
