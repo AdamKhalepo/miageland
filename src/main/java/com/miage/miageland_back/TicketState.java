@@ -2,6 +2,8 @@ package com.miage.miageland_back;
 
 public enum TicketState {
     VALID,
-    INVALID,
-    USED
+    CANCELLED,
+    USED,
+
+    PENDING_PAYMENT,
 }
