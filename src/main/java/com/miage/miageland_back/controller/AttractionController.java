@@ -3,8 +3,10 @@ package com.miage.miageland_back.controller;
 import com.miage.miageland_back.entities.Attraction;
 import com.miage.miageland_back.service.AttractionService;
 import com.miage.miageland_back.service.EmployeeService;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -30,27 +32,33 @@ public class AttractionController {
     }
 
     @GetMapping("/{attractionId}")
-    public Attraction getAttraction(@PathVariable String attractionId) {
-        return attractionService.getAttraction(Long.valueOf(attractionId));
+    public Attraction getAttraction(@PathVariable Long attractionId) {
+        return attractionService.getAttraction(attractionId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Attraction postAttraction(@RequestBody Attraction attraction) {
-        //todo : only admin can create attraction, so add annotation to check the user is an admin
+    public Attraction postAttraction(@RequestBody Attraction attraction,
+                                     @CookieValue(value = "user") Cookie userCookie) throws IllegalAccessException {
+        if (!employeeService.isManager(userCookie.getValue()) && !employeeService.isAdmin(userCookie.getValue()))
+            throw new IllegalAccessException("You must be an admin or manager to call this endpoint.");
         return attractionService.createAttraction(attraction);
     }
 
     @DeleteMapping("/{attractionId}")
-    public void deleteAttraction(@PathVariable String attractionId) {
-        //todo : only admin can delete attraction, so add annotation to check the user is an admin
-        attractionService.deleteAttraction(Long.valueOf(attractionId));
+    public void deleteAttraction(@PathVariable Long attractionId,
+                                 @CookieValue(value = "user") Cookie userCookie) throws IllegalAccessException {
+        if (!employeeService.isManager(userCookie.getValue()) && !employeeService.isAdmin(userCookie.getValue()))
+            throw new IllegalAccessException("You must be an admin or manager to call this endpoint.");
+        attractionService.deleteAttraction(attractionId);
     }
 
     @PatchMapping("/{attractionId}")
-    public boolean patchAttraction(@PathVariable String attractionId) {
-        //todo : only admin can update attraction, so add annotation to check the user is an admin
-        return attractionService.changeAttractionStatus(Long.valueOf(attractionId));
+    public boolean patchAttraction(@PathVariable Long attractionId,
+                                   @CookieValue(value = "user") Cookie userCookie) throws IllegalAccessException {
+        if (!employeeService.isManager(userCookie.getValue()) && !employeeService.isAdmin(userCookie.getValue()))
+            throw new IllegalAccessException("You must be an admin or manager to call this endpoint.");
+        return attractionService.changeAttractionStatus(attractionId);
     }
 
 

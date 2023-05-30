@@ -16,7 +16,7 @@ public class VisitorController {
 
     private final VisitorService visitorService;
     @GetMapping("/login")
-    public void getVisitor(@RequestBody Visitor visitor, HttpServletResponse response) {
+    public void loginVisitor(@RequestBody Visitor visitor, HttpServletResponse response) {
         this.visitorService.loginVisitor(visitor.getEmail(),response);
     }
 }

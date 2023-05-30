@@ -19,9 +19,9 @@ public class VisitorService {
 
         Visitor loggedVisitor = visitorRepository.findByEmail(visitorEmail);
 
-        cookieService.deleteCookies(response);
+        cookieService.deleteUserCookie(response);
         //Adding cookie to response to keep track of the employee
         //This cookie needs to be sent back to the server to identify the employee
-        cookieService.addVisitorCookie(loggedVisitor,response);
+        cookieService.addUserCookie(loggedVisitor.getEmail(), response);
     }
 }

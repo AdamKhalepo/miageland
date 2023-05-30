@@ -3,7 +3,6 @@ package com.miage.miageland_back.controller;
 import com.miage.miageland_back.dto.EmployeeDTO;
 import com.miage.miageland_back.entities.Employee;
 import com.miage.miageland_back.service.EmployeeService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,24 +24,26 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    @GetMapping()
-    public void getEmployee(@RequestBody EmployeeDTO employeeDTO, HttpServletResponse response) {
-        employeeService.loginEmployee(employeeDTO.getEmail(),response);
+    @GetMapping("/login")
+    public void loginEmployee(@RequestBody Employee employee, HttpServletResponse response) {
+        employeeService.loginEmployee(employee.getEmail(),response);
     }
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public void postEmployee(@RequestBody Employee employee,
-                             @CookieValue(value = "manager") Cookie managerCookie) {
-        if (!employeeService.isEmployee(managerCookie.getValue()))
-            throw new EntityNotFoundException("Logged in employee does not exists");
-        employeeService.createEmployee(employee);
+    public EmployeeDTO postEmployee(@RequestBody Employee employee,
+                             @CookieValue(value = "user") Cookie managerCookie) throws IllegalAccessException {
+        if (!employeeService.isManager(managerCookie.getValue()))
+            throw new IllegalAccessException("You must be a manager to call this endpoint.");
+        return employeeService.createEmployee(employee);
     }
 
-    @DeleteMapping()
+    @DeleteMapping("/{employeeId}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteEmployee(@RequestBody Employee employee) {
-        //todo : only admin can delete employee, so add annotation to check the user is an admin
-        employeeService.deleteEmployee(employee.getEmail());
+    public void deleteEmployee(@PathVariable Long employeeId,
+                               @CookieValue(value = "user") Cookie managerCookie) throws IllegalAccessException {
+        if (!employeeService.isManager(managerCookie.getValue()))
+            throw new IllegalAccessException("You must be a manager to call this endpoint.");
+        employeeService.deleteEmployee(employeeId,managerCookie.getValue());
     }
 }

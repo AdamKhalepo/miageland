@@ -1,6 +1,8 @@
 package com.miage.miageland_back.service;
 
+import com.miage.miageland_back.EmployeeRole;
 import com.miage.miageland_back.dao.repository.EmployeeRepository;
+import com.miage.miageland_back.dto.EmployeeDTO;
 import com.miage.miageland_back.entities.Employee;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -15,20 +17,21 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final CookieService cookieService;
 
-    private boolean requiredFields(Employee employee) {
+    private boolean missingFields(Employee employee) {
         return (employee.getEmail() == null || employee.getName() == null
                 || employee.getFirstName() == null || employee.getRole() == null);
     }
 
-    public void createEmployee(Employee newEmployee) {
-        if (requiredFields(newEmployee))
+    public EmployeeDTO createEmployee(Employee newEmployee) {
+        if (missingFields(newEmployee))
             throw new IllegalArgumentException("Missing parameters, please provide all parameters");
 
         if(employeeRepository.existsByEmail(newEmployee.getEmail())) {
             throw new EntityExistsException("Employee already exists");
         } else {
-            System.out.println(newEmployee.getRole());
             employeeRepository.save(newEmployee);
+
+            return new EmployeeDTO(newEmployee.getId(), newEmployee.getEmail(), newEmployee.getRole());
         }
     }
 
@@ -36,21 +39,32 @@ public class EmployeeService {
         if (!employeeRepository.existsByEmail(employeeEmail))
             throw new EntityNotFoundException("Employee does not exist");
 
-        Employee loggedEmployee = employeeRepository.findByEmail(employeeEmail);
-
-        cookieService.deleteCookies(response);
+        cookieService.deleteUserCookie(response);
         //Adding cookie to response to keep track of the employee
         //This cookie needs to be sent back to the server to identify the employee
-        cookieService.addEmployeeCookie(loggedEmployee,response);
+        cookieService.addUserCookie(employeeEmail,response);
     }
 
-    public void deleteEmployee(String employeeEmail) {
-        if (!employeeRepository.existsByEmail(employeeEmail))
-            throw new EntityNotFoundException("Employee does not exist");
-        employeeRepository.deleteByEmail(employeeEmail);
+    public void deleteEmployee(Long employeeIdToDelete, String userEmail) {
+        if (!employeeRepository.existsById(employeeIdToDelete))
+            throw new EntityNotFoundException("Employee does not exist.");
+
+        Employee connectedEmployee = employeeRepository.findByEmail(userEmail);
+        if (employeeIdToDelete.equals(connectedEmployee.getId()))
+            throw new IllegalStateException("You cannot delete yourself.");
+
+        employeeRepository.deleteById(employeeIdToDelete);
     }
 
-    public boolean isEmployee(String employeeEmail) {
-        return employeeRepository.existsByEmail(employeeEmail);
+    public boolean isEmployee(String email) {
+        return employeeRepository.existsByEmail(email);
+    }
+
+    public boolean isManager(String email) {
+        return this.employeeRepository.existsByEmailAndRole(email, EmployeeRole.MANAGER);
+    }
+
+    public boolean isAdmin(String email) {
+        return this.employeeRepository.existsByEmailAndRole(email, EmployeeRole.ADMIN);
     }
 }
