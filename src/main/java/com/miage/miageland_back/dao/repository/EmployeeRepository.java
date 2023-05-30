@@ -10,4 +10,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     boolean existsByEmail(String email);
 
     void deleteByEmail(String employeeEmail);
+
+    Employee findByEmail(String employeeEmail);
 }
