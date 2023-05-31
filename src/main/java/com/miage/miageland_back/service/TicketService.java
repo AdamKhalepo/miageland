@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.Date;
 
 @Service
@@ -17,12 +18,13 @@ public class TicketService {
 
     public Ticket validateTicket(int ticketId) {
         Ticket ticket = ticketRepository.findById((long) ticketId).orElseThrow(EntityNotFoundException::new);
-
-        if (ticket.getState() != TicketState.VALID)
+        //we have to verify that the Visit date is the current date.
+        if (ticket.getState() != TicketState.VALID && ! ticket.getVisitDate().equals(Calendar.getInstance().getTime()))
             throw new IllegalArgumentException("Ticket is not valid");
 
         //since the ticket is valid, we can update its state to USED
         ticket.setState(TicketState.USED);
+        //this line must be deleted
         ticket.setVisitDate(new Date());
         ticketRepository.save(ticket);
 
