@@ -1,6 +1,6 @@
 package com.miage.miageland_back.entities;
 
-import com.miage.miageland_back.TicketState;
+import com.miage.miageland_back.enums.TicketState;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

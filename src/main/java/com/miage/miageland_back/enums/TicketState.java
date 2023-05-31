@@ -1,4 +1,4 @@
-package com.miage.miageland_back;
+package com.miage.miageland_back.enums;
 
 public enum TicketState {
     VALID,

@@ -1,6 +1,6 @@
 package com.miage.miageland_back.service;
 
-import com.miage.miageland_back.EmployeeRole;
+import com.miage.miageland_back.enums.EmployeeRole;
 import com.miage.miageland_back.dao.repository.EmployeeRepository;
 import com.miage.miageland_back.dto.EmployeeDTO;
 import com.miage.miageland_back.entities.Employee;
@@ -26,17 +26,17 @@ public class EmployeeService {
         if (missingFields(newEmployee))
             throw new IllegalArgumentException("Missing parameters, please provide all parameters");
 
-        if(employeeRepository.existsByEmail(newEmployee.getEmail())) {
+        if(this.employeeRepository.existsByEmail(newEmployee.getEmail())) {
             throw new EntityExistsException("Employee already exists");
         } else {
-            employeeRepository.save(newEmployee);
+            this.employeeRepository.save(newEmployee);
 
             return new EmployeeDTO(newEmployee.getId(), newEmployee.getEmail(), newEmployee.getRole());
         }
     }
 
     public void loginEmployee(String employeeEmail, HttpServletResponse response) {
-        if (!employeeRepository.existsByEmail(employeeEmail))
+        if (!this.employeeRepository.existsByEmail(employeeEmail))
             throw new EntityNotFoundException("Employee does not exist");
 
         cookieService.deleteUserCookie(response);
@@ -46,18 +46,18 @@ public class EmployeeService {
     }
 
     public void deleteEmployee(Long employeeIdToDelete, String userEmail) {
-        if (!employeeRepository.existsById(employeeIdToDelete))
+        if (!this.employeeRepository.existsById(employeeIdToDelete))
             throw new EntityNotFoundException("Employee does not exist.");
 
-        Employee connectedEmployee = employeeRepository.findByEmail(userEmail);
+        Employee connectedEmployee = this.employeeRepository.findByEmail(userEmail);
         if (employeeIdToDelete.equals(connectedEmployee.getId()))
             throw new IllegalStateException("You cannot delete yourself.");
 
-        employeeRepository.deleteById(employeeIdToDelete);
+        this.employeeRepository.deleteById(employeeIdToDelete);
     }
 
     public boolean isEmployee(String email) {
-        return employeeRepository.existsByEmail(email);
+        return this.employeeRepository.existsByEmail(email);
     }
 
     public boolean isManager(String email) {

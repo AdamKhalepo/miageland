@@ -1,6 +1,6 @@
 package com.miage.miageland_back.dto;
 
-import com.miage.miageland_back.EmployeeRole;
+import com.miage.miageland_back.enums.EmployeeRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

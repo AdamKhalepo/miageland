@@ -1,6 +1,6 @@
 package com.miage.miageland_back.entities;
 
-import com.miage.miageland_back.EmployeeRole;
+import com.miage.miageland_back.enums.EmployeeRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

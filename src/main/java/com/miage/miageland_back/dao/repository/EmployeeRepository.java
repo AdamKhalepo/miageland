@@ -1,6 +1,6 @@
 package com.miage.miageland_back.dao.repository;
 
-import com.miage.miageland_back.EmployeeRole;
+import com.miage.miageland_back.enums.EmployeeRole;
 import com.miage.miageland_back.entities.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

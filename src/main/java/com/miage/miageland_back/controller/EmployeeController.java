@@ -26,24 +26,24 @@ public class EmployeeController {
 
     @GetMapping("/login")
     public void loginEmployee(@RequestBody Employee employee, HttpServletResponse response) {
-        employeeService.loginEmployee(employee.getEmail(),response);
+        this.employeeService.loginEmployee(employee.getEmail(),response);
     }
 
-    @PostMapping()
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EmployeeDTO postEmployee(@RequestBody Employee employee,
                              @CookieValue(value = "user") Cookie managerCookie) throws IllegalAccessException {
-        if (!employeeService.isManager(managerCookie.getValue()))
+        if (!this.employeeService.isManager(managerCookie.getValue()))
             throw new IllegalAccessException("You must be a manager to call this endpoint.");
-        return employeeService.createEmployee(employee);
+        return this.employeeService.createEmployee(employee);
     }
 
     @DeleteMapping("/{employeeId}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteEmployee(@PathVariable Long employeeId,
                                @CookieValue(value = "user") Cookie managerCookie) throws IllegalAccessException {
-        if (!employeeService.isManager(managerCookie.getValue()))
+        if (!this.employeeService.isManager(managerCookie.getValue()))
             throw new IllegalAccessException("You must be a manager to call this endpoint.");
-        employeeService.deleteEmployee(employeeId,managerCookie.getValue());
+        this.employeeService.deleteEmployee(employeeId,managerCookie.getValue());
     }
 }
