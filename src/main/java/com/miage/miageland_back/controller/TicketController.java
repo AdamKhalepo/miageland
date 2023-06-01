@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("miageland/tickets")
+@RequestMapping("miageland")
 @RequiredArgsConstructor
 public class TicketController {
 
@@ -20,8 +20,7 @@ public class TicketController {
     private final VisitorService visitorService;
 
     //TODO : FIND a better endpoint name
-    @PatchMapping( "/employee/{ticketId}")
-    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping( "/tickets/employee/{ticketId}")
     public void patchTicketValidation(@PathVariable Long ticketId,
                             @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
         if (!this.employeeService.isEmployee(userEmail))
@@ -29,33 +28,33 @@ public class TicketController {
         this.ticketService.validateTicket(ticketId);
     }
 
-    @PostMapping
+    @PostMapping("/tickets")
+    @ResponseStatus(HttpStatus.CREATED)
     public Ticket postTicket(@RequestBody Ticket ticket,
                            @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
         if (!this.visitorService.isVisitor(userEmail))
             throw new IllegalAccessException("You must be a visitor to call this endpoint.");
-        return this.ticketService.createTicket(ticket, this.visitorService.getVisitor(userEmail));
+        return this.ticketService.createTicket(ticket, this.visitorService.getVisitorByEmail(userEmail));
     }
 
-    @PatchMapping("/{ticketId}")
+    @PatchMapping("/tickets/{ticketId}")
     public void patchTicketPayment(@PathVariable Long ticketId,
                             @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
         if (!this.visitorService.isVisitor(userEmail))
             throw new IllegalAccessException("You must be a visitor to call this endpoint.");
 
-        this.ticketService.buyTicket(ticketId, this.visitorService.getVisitor(userEmail));
+        this.ticketService.buyTicket(ticketId, this.visitorService.getVisitorByEmail(userEmail));
     }
 
-    @GetMapping
-    public List<Ticket> getUserTickets(@CookieValue(value = "user") String userEmail) throws IllegalAccessException {
-        if (!this.visitorService.isVisitor(userEmail))
-            throw new IllegalAccessException("You must be a visitor to call this endpoint.");
-        return this.ticketService.getUserTickets(this.visitorService.getVisitor(userEmail));
+    @GetMapping("/visitors/{visitorId}/tickets")
+    public List<Ticket> getUserTickets(@PathVariable Long visitorId) {
+        return this.ticketService.getUserTickets(this.visitorService.getVisitorById(visitorId));
     }
 
     //to refine
-    @DeleteMapping("/{id}/tickets/{idTicket}")
-    public void deleteTicket(@PathVariable Long idTicket){
-        this.ticketService.refundTicket(idTicket);
+    @PatchMapping("/visitors/{visitorId}/tickets/{ticketId}")
+    public void deleteTicket(@PathVariable Long visitorId,
+                             @PathVariable Long ticketId) {
+        this.ticketService.cancelTicket(visitorId,ticketId);
     }
 }

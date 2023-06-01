@@ -14,7 +14,7 @@ public class VisitorService {
     private final CookieService cookieService;
 
     public void loginVisitor(String visitorEmail, HttpServletResponse response) {
-        Visitor loggedVisitor = getVisitor(visitorEmail);
+        Visitor loggedVisitor = getVisitorByEmail(visitorEmail);
 
         this.cookieService.deleteUserCookie(response);
         //Adding cookie to response to keep track of the employee
@@ -22,11 +22,14 @@ public class VisitorService {
         this.cookieService.addUserCookie(loggedVisitor.getEmail(), response);
     }
 
-    public Visitor getVisitor(String visitorEmail) {
-        if (!this.visitorRepository.existsByEmail(visitorEmail))
-            throw new EntityNotFoundException("Visitor does not exist");
+    public Visitor getVisitorByEmail(String visitorEmail) {
+        return this.visitorRepository.findByEmail(visitorEmail)
+                .orElseThrow(() -> new EntityNotFoundException("Visitor does not exist"));
+    }
 
-        return this.visitorRepository.findByEmail(visitorEmail);
+    public Visitor getVisitorById(Long visitorId) {
+        return this.visitorRepository.findById(visitorId)
+                .orElseThrow(() -> new EntityNotFoundException("Visitor does not exist"));
     }
 
     public boolean isVisitor(String userCookie) {

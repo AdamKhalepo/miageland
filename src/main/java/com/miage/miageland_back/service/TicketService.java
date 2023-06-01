@@ -64,11 +64,18 @@ public class TicketService {
     }
 
     //TO REFINE
-    public void refundTicket(Long id) {
-        ticketRepository.deleteById(id);
-        if(ticketRepository.findById(id).isPresent())
-            throw new EntityNotFoundException("The ticket is not canceled");
+    public void cancelTicket(Long visitorId, Long ticketId) {
+        //todo : handle the date of the refund
+        Ticket ticket = ticketRepository.findById(ticketId).
+                orElseThrow(() -> new EntityNotFoundException("Ticket with id : " + ticketId + " does not exist"));
+        if (!ticket.getVisitor().getId().equals(visitorId))
+            throw new IllegalStateException("The ticket does not belong to the visitor");
 
+        System.out.println(!ticket.getState().equals(TicketState.VALID));
+        System.out.println(!ticket.getState().equals(TicketState.PENDING_PAYMENT));
+        if (!(ticket.getState().equals(TicketState.VALID) || ticket.getState().equals(TicketState.PENDING_PAYMENT)))
+            throw new IllegalStateException("The ticket cannot be cancelled");
+        ticket.setState(TicketState.CANCELLED);
     }
 
     public List<Ticket> getUserTickets(Visitor visitor) {
