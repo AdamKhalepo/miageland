@@ -1,16 +1,22 @@
 package com.miage.miageland_back.service;
 
+import com.miage.miageland_back.dao.repository.TicketRepository;
 import com.miage.miageland_back.dao.repository.VisitorRepository;
+import com.miage.miageland_back.dto.VisitorDto;
 import com.miage.miageland_back.entities.Visitor;
+import com.miage.miageland_back.enums.TicketState;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class VisitorService {
     private final VisitorRepository visitorRepository;
+    private final TicketRepository ticketRepository;
     private final CookieService cookieService;
 
     public void loginVisitor(String visitorEmail, HttpServletResponse response) {
@@ -34,5 +40,10 @@ public class VisitorService {
 
     public boolean isVisitor(String userCookie) {
         return this.visitorRepository.existsByEmail(userCookie);
+    }
+
+    public List<VisitorDto> allVisitors(){
+        return visitorRepository.findAll().stream().map(visitor ->
+            new VisitorDto(visitor.getId(),ticketRepository.countTicketsByVisitorAndState(visitor, TicketState.USED) )).toList();
     }
 }
