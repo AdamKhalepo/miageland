@@ -44,6 +44,28 @@ public class VisitorService {
 
     public List<VisitorDTO> allVisitors(){
         return visitorRepository.findAll().stream().map(visitor ->
-            new VisitorDTO(visitor.getId(),ticketRepository.countTicketsByVisitorAndState(visitor, TicketState.USED) )).toList();
+            new VisitorDTO(
+                    visitor.getId(),
+                    visitor.getName(),
+                    visitor.getFirstName(),
+                    ticketRepository.countTicketsByVisitorAndState(visitor, TicketState.USED)
+            )
+        ).toList();
+    }
+
+    public Visitor createVisitor(Visitor newVisitor) {
+        if (missingFields(newVisitor))
+            throw new IllegalArgumentException("Missing parameters, please provide all parameters");
+
+        if(this.visitorRepository.existsByEmail(newVisitor.getEmail()))
+            throw new EntityNotFoundException("Visitor already exists");
+
+        this.visitorRepository.save(newVisitor);
+
+        return newVisitor;
+    }
+
+    private boolean missingFields(Visitor newVisitor) {
+        return newVisitor.getEmail() == null || newVisitor.getName() == null || newVisitor.getFirstName() == null;
     }
 }

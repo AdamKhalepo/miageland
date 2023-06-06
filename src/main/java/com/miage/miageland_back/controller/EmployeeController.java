@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("miageland/employee")
+@RequestMapping("miageland/employees")
 @RequiredArgsConstructor
 public class EmployeeController {
 

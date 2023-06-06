@@ -11,7 +11,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class VisitorDTO {
 
-
     private Long id;
+
+    private String name;
+
+    private String lastName;
+
     private int nbVisite;
 }

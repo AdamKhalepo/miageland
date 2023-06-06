@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("miageland/attraction")
+@RequestMapping("miageland/attractions")
 @RequiredArgsConstructor
 public class AttractionController {
     private final AttractionService attractionService;
