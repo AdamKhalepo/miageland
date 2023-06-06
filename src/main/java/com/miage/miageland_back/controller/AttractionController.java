@@ -60,8 +60,4 @@ public class AttractionController {
             throw new IllegalAccessException("You must be an admin or manager to call this endpoint.");
         return attractionService.changeAttractionStatus(attractionId);
     }
-
-
-
-
 }

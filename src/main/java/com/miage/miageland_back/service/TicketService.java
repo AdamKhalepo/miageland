@@ -19,7 +19,6 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final VisitorRepository visitorRepository;
 
-
     public void validateTicket(Long ticketId) {
         Ticket ticket = ticketRepository.findById(ticketId).
                 orElseThrow(() -> new EntityNotFoundException("Ticket with id : " + ticketId + " does not exist"));
@@ -83,5 +82,4 @@ public class TicketService {
         return this.ticketRepository.findByVisitor(visitor).orElseThrow(() -> new EntityNotFoundException("No Ticket with visitor id: " + visitor.getId() + " exists"));
 
     }
-
 }

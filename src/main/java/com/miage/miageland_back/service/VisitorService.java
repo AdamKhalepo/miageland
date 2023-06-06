@@ -2,7 +2,7 @@ package com.miage.miageland_back.service;
 
 import com.miage.miageland_back.dao.repository.TicketRepository;
 import com.miage.miageland_back.dao.repository.VisitorRepository;
-import com.miage.miageland_back.dto.VisitorDto;
+import com.miage.miageland_back.dto.VisitorDTO;
 import com.miage.miageland_back.entities.Visitor;
 import com.miage.miageland_back.enums.TicketState;
 import jakarta.persistence.EntityNotFoundException;
@@ -42,8 +42,8 @@ public class VisitorService {
         return this.visitorRepository.existsByEmail(userCookie);
     }
 
-    public List<VisitorDto> allVisitors(){
+    public List<VisitorDTO> allVisitors(){
         return visitorRepository.findAll().stream().map(visitor ->
-            new VisitorDto(visitor.getId(),ticketRepository.countTicketsByVisitorAndState(visitor, TicketState.USED) )).toList();
+            new VisitorDTO(visitor.getId(),ticketRepository.countTicketsByVisitorAndState(visitor, TicketState.USED) )).toList();
     }
 }
