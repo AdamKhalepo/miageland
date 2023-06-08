@@ -20,6 +20,7 @@ public class TicketService {
     private final VisitorRepository visitorRepository;
 
     public void validateTicket(Long ticketId) {
+        //TODO : add verification with the limit (max ticket per day)
         Ticket ticket = ticketRepository.findById(ticketId).
                 orElseThrow(() -> new EntityNotFoundException("Ticket with id : " + ticketId + " does not exist"));
         //we have to verify that the Visit date is the current date.

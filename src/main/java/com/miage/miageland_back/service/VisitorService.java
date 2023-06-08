@@ -68,4 +68,8 @@ public class VisitorService {
     private boolean missingFields(Visitor newVisitor) {
         return newVisitor.getEmail() == null || newVisitor.getName() == null || newVisitor.getFirstName() == null;
     }
+
+    public boolean isSameVisitor(String userCookie, Long visitorId) {
+        return this.visitorRepository.findById(visitorId).get().getEmail().equals(userCookie);
+    }
 }

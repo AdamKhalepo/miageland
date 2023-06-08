@@ -14,8 +14,9 @@ public class CookieService {
     }
 
     public void addUserCookie(String email,HttpServletResponse response) {
-        Cookie adminCookie = new Cookie("user", email);
-        adminCookie.setPath("/");
-        response.addCookie(adminCookie);
+        Cookie userCookie = new Cookie("user", email);
+        userCookie.setPath("/");
+        userCookie.setMaxAge(60 * 60);
+        response.addCookie(userCookie);
     }
 }

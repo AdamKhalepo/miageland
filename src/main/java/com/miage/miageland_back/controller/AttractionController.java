@@ -27,12 +27,22 @@ public class AttractionController {
     private final EmployeeService employeeService;
 
     @GetMapping
-    public List<Attraction> getAttractions() {
+    public List<Attraction> getAttractions(@CookieValue(value = "user") Cookie userCookie) throws IllegalAccessException {
+        if (!employeeService.isEmployee(userCookie.getValue()))
+            throw new IllegalAccessException("You must be an employee to call this endpoint.");
         return this.attractionService.getAttractions();
     }
 
+    @GetMapping("/opened")
+    public List<Attraction> getOpenedAttractions() {
+        return this.attractionService.getOpenedAttractions();
+    }
+
     @GetMapping("/{attractionId}")
-    public Attraction getAttraction(@PathVariable Long attractionId) {
+    public Attraction getAttraction(@PathVariable Long attractionId,
+                                    @CookieValue(value = "user") Cookie userCookie) throws IllegalAccessException {
+        if (!employeeService.isEmployee(userCookie.getValue()))
+            throw new IllegalAccessException("You must be an employee to call this endpoint.");
         return attractionService.getAttraction(attractionId);
     }
 

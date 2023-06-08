@@ -46,12 +46,16 @@ public class AttractionService {
         }
     }
 
-    public List<Attraction> getAttractions() {
-        return this.attractionRepository.findAll();
+    public List<Attraction> getOpenedAttractions() {
+        return this.attractionRepository.findByIsOpenTrue();
     }
 
     public Attraction getAttraction(Long attractionId) {
         return this.attractionRepository.findById(attractionId)
                 .orElseThrow(() -> new EntityNotFoundException("Attraction does not exist"));
+    }
+
+    public List<Attraction> getAttractions() {
+        return this.attractionRepository.findAll();
     }
 }

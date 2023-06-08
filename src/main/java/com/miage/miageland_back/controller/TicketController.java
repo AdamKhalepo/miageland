@@ -27,27 +27,34 @@ public class TicketController {
     private final EmployeeService employeeService;
     private final VisitorService visitorService;
 
-    //TODO : FIND a better endpoint name
-    @PatchMapping( "/tickets/employee/{ticketId}")
+    @PatchMapping( "employee/tickets/{ticketId}")
     public void patchTicketValidation(@PathVariable Long ticketId,
-                            @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
+                                      @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
         if (!this.employeeService.isEmployee(userEmail))
             throw new IllegalAccessException("You must be an employee to call this endpoint.");
+
         this.ticketService.validateTicket(ticketId);
     }
 
-    @PostMapping("/tickets")
+    @PostMapping("visitors/{visitorId}/ticket")
     @ResponseStatus(HttpStatus.CREATED)
     public Ticket postTicket(@RequestBody Ticket ticket,
-                           @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
+                             @PathVariable Long visitorId,
+                             @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
+        if (!this.visitorService.isSameVisitor(userEmail,visitorId))
+            throw new IllegalAccessException("User email in cookie and user id path must be the same user.");
         if (!this.visitorService.isVisitor(userEmail))
             throw new IllegalAccessException("You must be a visitor to call this endpoint.");
+
         return this.ticketService.createTicket(ticket, this.visitorService.getVisitorByEmail(userEmail));
     }
 
-    @PatchMapping("/tickets/{ticketId}")
+    @PatchMapping("visitors/{visitorId}/tickets/{ticketId}/payment")
     public void patchTicketPayment(@PathVariable Long ticketId,
-                            @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
+                                   @PathVariable Long visitorId,
+                                   @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
+        if (!this.visitorService.isSameVisitor(userEmail,visitorId))
+            throw new IllegalAccessException("User email in cookie and user id path must be the same user.");
         if (!this.visitorService.isVisitor(userEmail))
             throw new IllegalAccessException("You must be a visitor to call this endpoint.");
 
@@ -55,14 +62,27 @@ public class TicketController {
     }
 
     @GetMapping("/visitors/{visitorId}/tickets")
-    public List<Ticket> getUserTickets(@PathVariable Long visitorId) {
+    public List<Ticket> getUserTickets(@PathVariable Long visitorId,
+                                       @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
+        //If the user is an employee OR if the user is a visitor and the visitorId is the same as the user's id
+        if (!employeeService.isEmployee(userEmail) &&
+                (!this.visitorService.isVisitor(userEmail) || !this.visitorService.isSameVisitor(userEmail, visitorId))) {
+            throw new IllegalAccessException("An error occured, try again later.");
+        }
+
         return this.ticketService.getUserTickets(this.visitorService.getVisitorById(visitorId));
     }
 
-    //to refine
-    @PatchMapping("/visitors/{visitorId}/tickets/{ticketId}")
+    @PatchMapping("/visitors/{visitorId}/tickets/{ticketId}/cancel")
     public void deleteTicket(@PathVariable Long visitorId,
-                             @PathVariable Long ticketId) {
+                             @PathVariable Long ticketId,
+                             @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
+        //If the user is an employee OR if the user is a visitor and the visitorId is the same as the user's id
+        if (!employeeService.isEmployee(userEmail) &&
+                (!this.visitorService.isVisitor(userEmail) || !this.visitorService.isSameVisitor(userEmail, visitorId))) {
+            throw new IllegalAccessException("An error occured, try again later.");
+        }
+
         this.ticketService.cancelTicket(visitorId,ticketId);
     }
 }
