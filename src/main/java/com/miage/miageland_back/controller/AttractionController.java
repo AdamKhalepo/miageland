@@ -1,5 +1,6 @@
 package com.miage.miageland_back.controller;
 
+import com.miage.miageland_back.dto.AttractionDTO;
 import com.miage.miageland_back.entities.Attraction;
 import com.miage.miageland_back.service.AttractionService;
 import com.miage.miageland_back.service.EmployeeService;
@@ -64,8 +65,8 @@ public class AttractionController {
     }
 
     @PatchMapping("/{attractionId}")
-    public boolean patchAttraction(@PathVariable Long attractionId,
-                                   @CookieValue(value = "user") Cookie userCookie) throws IllegalAccessException {
+    public AttractionDTO patchAttraction(@PathVariable Long attractionId,
+                                         @CookieValue(value = "user") Cookie userCookie) throws IllegalAccessException {
         if (!employeeService.isManager(userCookie.getValue()) && !employeeService.isAdmin(userCookie.getValue()))
             throw new IllegalAccessException("You must be an admin or manager to call this endpoint.");
         return attractionService.changeAttractionStatus(attractionId);

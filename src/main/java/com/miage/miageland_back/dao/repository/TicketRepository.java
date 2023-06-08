@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
-    Optional<List<Ticket>> findByVisitor(Visitor visitor);
+    List<Ticket> findByVisitor(Visitor visitor);
 
     Integer countTicketsByVisitDate(LocalDate date);
 

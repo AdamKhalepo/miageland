@@ -2,6 +2,7 @@ package com.miage.miageland_back.service;
 
 import com.miage.miageland_back.dao.repository.TicketRepository;
 import com.miage.miageland_back.dao.repository.VisitorRepository;
+import com.miage.miageland_back.dto.TicketDTO;
 import com.miage.miageland_back.entities.Ticket;
 import com.miage.miageland_back.entities.Visitor;
 import com.miage.miageland_back.enums.TicketState;
@@ -20,7 +21,6 @@ public class TicketService {
     private final VisitorRepository visitorRepository;
 
     public void validateTicket(Long ticketId) {
-        //TODO : add verification with the limit (max ticket per day)
         Ticket ticket = ticketRepository.findById(ticketId).
                 orElseThrow(() -> new EntityNotFoundException("Ticket with id : " + ticketId + " does not exist"));
         //we have to verify that the Visit date is the current date.
@@ -32,8 +32,8 @@ public class TicketService {
         ticketRepository.save(ticket);
     }
 
-    //TO REFINE
-    public Ticket createTicket(Ticket ticket, Visitor visitor) {
+    //TODO : TO REFINE
+    public TicketDTO createTicket(Ticket ticket, Visitor visitor) {
         //TODO : add verification with the limit (max ticket per day)
         //we have to verify that the Visit date is before the current date.
         if (ticket.getVisitDate().isBefore(LocalDate.now()))
@@ -49,10 +49,15 @@ public class TicketService {
         ticket.setVisitor(visitor);
         ticket.setState(TicketState.PENDING_PAYMENT);
         ticketRepository.save(ticket);
-        return ticket;
+
+        return new TicketDTO(ticket.getId(),
+                ticket.getVisitDate(),
+                ticket.getVisitor().getEmail(),
+                ticket.getPrice(),
+                ticket.getState());
     }
 
-    //TO REFINE
+    //TODO : TO REFINE
     public void buyTicket(Long id, Visitor loggedVisitor) {
         Ticket ticket = ticketRepository.findById(id).
                 orElseThrow(() -> new EntityNotFoundException("Ticket with id : " + id + " does not exist"));
@@ -64,7 +69,7 @@ public class TicketService {
         ticketRepository.save(ticket);
     }
 
-    //TO REFINE
+    //TODO : TO REFINE
     public void cancelTicket(Long visitorId, Long ticketId) {
         //todo : handle the date of the refund
         Ticket ticket = ticketRepository.findById(ticketId).
@@ -79,8 +84,13 @@ public class TicketService {
         ticketRepository.save(ticket);
     }
 
-    public List<Ticket> getUserTickets(Visitor visitor) {
-        return this.ticketRepository.findByVisitor(visitor).orElseThrow(() -> new EntityNotFoundException("No Ticket with visitor id: " + visitor.getId() + " exists"));
-
+    public List<TicketDTO> getUserTickets(Visitor visitor) {
+        return this.ticketRepository.findByVisitor(visitor).stream().map(ticket ->
+                new TicketDTO(ticket.getId(),
+                        ticket.getVisitDate(),
+                        ticket.getVisitor().getEmail(),
+                        ticket.getPrice(),
+                        ticket.getState()))
+                .toList();
     }
 }

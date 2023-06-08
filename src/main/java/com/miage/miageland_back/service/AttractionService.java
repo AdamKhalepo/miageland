@@ -1,6 +1,7 @@
 package com.miage.miageland_back.service;
 
 import com.miage.miageland_back.dao.repository.AttractionRepository;
+import com.miage.miageland_back.dto.AttractionDTO;
 import com.miage.miageland_back.entities.Attraction;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -35,12 +36,16 @@ public class AttractionService {
         }
     }
 
-    public boolean changeAttractionStatus(Long attractionId) {
+    public AttractionDTO changeAttractionStatus(Long attractionId) {
         if (this.attractionRepository.existsById(attractionId)) {
             Attraction attractionToUpdate = this.attractionRepository.findById(attractionId).get();
             attractionToUpdate.setOpen(!attractionToUpdate.isOpen());
             this.attractionRepository.save(attractionToUpdate);
-            return attractionToUpdate.isOpen();
+
+            AttractionDTO attractionDTO = new AttractionDTO();
+            attractionDTO.setName(attractionToUpdate.getName());
+            attractionDTO.setOpen(attractionToUpdate.isOpen());
+            return attractionDTO;
         } else {
             throw new EntityNotFoundException("Attraction does not exist");
         }

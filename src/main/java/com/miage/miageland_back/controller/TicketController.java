@@ -1,5 +1,6 @@
 package com.miage.miageland_back.controller;
 
+import com.miage.miageland_back.dto.TicketDTO;
 import com.miage.miageland_back.entities.Ticket;
 import com.miage.miageland_back.service.EmployeeService;
 import com.miage.miageland_back.service.TicketService;
@@ -38,7 +39,7 @@ public class TicketController {
 
     @PostMapping("visitors/{visitorId}/ticket")
     @ResponseStatus(HttpStatus.CREATED)
-    public Ticket postTicket(@RequestBody Ticket ticket,
+    public TicketDTO postTicket(@RequestBody Ticket ticket,
                              @PathVariable Long visitorId,
                              @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
         if (!this.visitorService.isSameVisitor(userEmail,visitorId))
@@ -62,8 +63,8 @@ public class TicketController {
     }
 
     @GetMapping("/visitors/{visitorId}/tickets")
-    public List<Ticket> getUserTickets(@PathVariable Long visitorId,
-                                       @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
+    public List<TicketDTO> getUserTickets(@PathVariable Long visitorId,
+                                          @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
         //If the user is an employee OR if the user is a visitor and the visitorId is the same as the user's id
         if (!employeeService.isEmployee(userEmail) &&
                 (!this.visitorService.isVisitor(userEmail) || !this.visitorService.isSameVisitor(userEmail, visitorId))) {
