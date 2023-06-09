@@ -3,6 +3,7 @@ package com.miage.miageland_back.service;
 import com.miage.miageland_back.dao.repository.TicketRepository;
 import com.miage.miageland_back.dao.repository.VisitorRepository;
 import com.miage.miageland_back.dto.TicketDTO;
+import com.miage.miageland_back.entities.Park;
 import com.miage.miageland_back.entities.Ticket;
 import com.miage.miageland_back.entities.Visitor;
 import com.miage.miageland_back.enums.TicketState;
@@ -34,13 +35,20 @@ public class TicketService {
 
     //TODO : TO REFINE
     public TicketDTO createTicket(Ticket ticket, Visitor visitor) {
-        //TODO : add verification with the limit (max ticket per day)
         //we have to verify that the Visit date is before the current date.
         if (ticket.getVisitDate().isBefore(LocalDate.now()))
             throw new IllegalArgumentException("The visit date must be in the future");
+
+        //we have to verify that the gauge of the park is not exceeded
+        if (Park.getInstance().getGauge() != null) {
+            if (ticketRepository.countTicketsByVisitDate(ticket.getVisitDate()) >= Park.getInstance().getGauge())
+                throw new IllegalArgumentException("The gauge of the park is exceeded");
+        }
+
         //we have to verify that the price is positive
         if (ticket.getPrice() < 0)
             throw new IllegalArgumentException("The price must be positive");
+
         //we have to verify that the visitor Id exists
         if (!visitorRepository.existsById(visitor.getId())) {
             throw new EntityNotFoundException("Visitor with id : " + visitor.getId() + " does not exist");

@@ -1,19 +1,26 @@
 package com.miage.miageland_back.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 public class Park {
 
-    @Id
-    private int id;
+    private static Park INSTANCE;
 
-    private int jaugeMax;
+    private String name;
 
-    private int nbMaxJournalier;
+    private Integer gauge;
+
+    public static Park getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new Park("MiageLand");
+        }
+        return INSTANCE;
+    }
+
+    public Park (String name) {
+        this.name = name;
+    }
 }

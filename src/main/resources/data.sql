@@ -1,5 +1,3 @@
-INSERT INTO PARK (ID,JAUGE_MAX,NB_MAX_JOURNALIER) VALUES (1,1000,0);
-
 -- Roles : 0 = employee, 1 = admin, 2 = manager
 INSERT INTO EMPLOYEE (FIRST_NAME,NAME,EMAIL,ROLE) VALUES ('Tchouk','Tchouk','tchoukdu12@gmail.com','2');
 INSERT INTO EMPLOYEE (FIRST_NAME,NAME,EMAIL,ROLE) VALUES ('Adam','Khalepo','adam@gmail.com','0');
