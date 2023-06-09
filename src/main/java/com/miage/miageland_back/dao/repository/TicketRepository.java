@@ -33,7 +33,4 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     Integer getMaxTicketsInAFutureDay();
 
     Integer countTicketsByVisitorAndState(Visitor visitor,TicketState ticketState);
-
-
-
 }

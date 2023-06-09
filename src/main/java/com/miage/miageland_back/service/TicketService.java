@@ -33,7 +33,6 @@ public class TicketService {
         ticketRepository.save(ticket);
     }
 
-    //TODO : TO REFINE
     public TicketDTO createTicket(Ticket ticket, Visitor visitor) {
         //we have to verify that the Visit date is before the current date.
         if (ticket.getVisitDate().isBefore(LocalDate.now()))
@@ -65,7 +64,7 @@ public class TicketService {
                 ticket.getState());
     }
 
-    //TODO : TO REFINE
+
     public void buyTicket(Long id, Visitor loggedVisitor) {
         Ticket ticket = ticketRepository.findById(id).
                 orElseThrow(() -> new EntityNotFoundException("Ticket with id : " + id + " does not exist"));
@@ -77,19 +76,26 @@ public class TicketService {
         ticketRepository.save(ticket);
     }
 
-    //TODO : TO REFINE
-    public void cancelTicket(Long visitorId, Long ticketId) {
-        //todo : handle the date of the refund
+    public TicketDTO cancelTicket(Long visitorId, Long ticketId) {
         Ticket ticket = ticketRepository.findById(ticketId).
                 orElseThrow(() -> new EntityNotFoundException("Ticket with id : " + ticketId + " does not exist"));
         if (!ticket.getVisitor().getId().equals(visitorId))
             throw new IllegalStateException("The ticket does not belong to the visitor");
-        System.out.println(!ticket.getState().equals(TicketState.VALID));
-        System.out.println(!ticket.getState().equals(TicketState.PENDING_PAYMENT));
+
+        //if the ticket is less than 7 days before the visit date, it cannot be cancelled
+        if (LocalDate.now().plusDays(7).isAfter(ticket.getVisitDate()))
+            throw new IllegalStateException("The ticket cannot be cancelled less than 7 days before the visit date");
+
         if (!(ticket.getState().equals(TicketState.VALID) || ticket.getState().equals(TicketState.PENDING_PAYMENT)))
             throw new IllegalStateException("The ticket cannot be cancelled");
         ticket.setState(TicketState.CANCELLED);
         ticketRepository.save(ticket);
+
+        return new TicketDTO(ticket.getId(),
+                ticket.getVisitDate(),
+                ticket.getVisitor().getEmail(),
+                ticket.getPrice(),
+                ticket.getState());
     }
 
     public List<TicketDTO> getUserTickets(Visitor visitor) {

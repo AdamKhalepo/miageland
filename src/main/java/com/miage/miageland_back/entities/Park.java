@@ -20,7 +20,7 @@ public class Park {
         return INSTANCE;
     }
 
-    public Park (String name) {
+    private Park (String name) {
         this.name = name;
     }
 }

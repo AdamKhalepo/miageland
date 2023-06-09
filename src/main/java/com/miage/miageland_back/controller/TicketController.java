@@ -75,7 +75,7 @@ public class TicketController {
     }
 
     @PatchMapping("/visitors/{visitorId}/tickets/{ticketId}/cancel")
-    public void deleteTicket(@PathVariable Long visitorId,
+    public TicketDTO patchTicketCancelation(@PathVariable Long visitorId,
                              @PathVariable Long ticketId,
                              @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
         //If the user is an employee OR if the user is a visitor and the visitorId is the same as the user's id
@@ -84,6 +84,6 @@ public class TicketController {
             throw new IllegalAccessException("An error occured, try again later.");
         }
 
-        this.ticketService.cancelTicket(visitorId,ticketId);
+        return this.ticketService.cancelTicket(visitorId,ticketId);
     }
 }
