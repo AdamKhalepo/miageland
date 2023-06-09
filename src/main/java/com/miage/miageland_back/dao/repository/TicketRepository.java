@@ -17,6 +17,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     Integer countTicketsByVisitDate(LocalDate date);
 
+    Integer countTicketsByVisitDateAndState(LocalDate date,TicketState ticketState);
+
+
     Integer countTicketsByState(TicketState ticketState);
 
     List<Ticket> findByVisitDate(LocalDate date);

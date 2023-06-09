@@ -1,25 +1,17 @@
 package com.miage.miageland_back.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import lombok.Data;
 
 import java.time.LocalDate;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
+@Data
 public class Statistic {
-
-    private double dailyRecipe;
-
-    private int ticketsSoldperDay;
-
-    private int ticketsCancelled;
-
-    private int ticketsOnStandBy;
-
+    int ticketsSoldperDay;
     private LocalDate date;
+    private double dailyRecipe;
+    private int ticketsCancelled;
+    private int ticketsOnStandBy;
 }
+
+
