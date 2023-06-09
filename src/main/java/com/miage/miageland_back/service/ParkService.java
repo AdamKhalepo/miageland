@@ -26,8 +26,8 @@ public class ParkService {
         statistic.setDate(date);
         statistic.setDailyRecipe(dailyRecipe);
         statistic.setTicketsSoldperDay(ticketRepository.countTicketsByVisitDateAndState(date,TicketState.VALID));
-        statistic.setTicketsCancelled(ticketRepository.countTicketsByState(TicketState.CANCELLED));
-        statistic.setTicketsOnStandBy(ticketRepository.countTicketsByState(TicketState.PENDING_PAYMENT));
+        statistic.setTicketsCancelled(ticketRepository.countTicketsByVisitDateAndState(date,TicketState.CANCELLED));
+        statistic.setTicketsOnStandBy(ticketRepository.countTicketsByVisitDateAndState(date,TicketState.PENDING_PAYMENT));
         return statistic;
     }
 
