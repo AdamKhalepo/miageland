@@ -1,14 +1,12 @@
 package com.miage.miageland_back.park;
 
-
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Data
-/**
- * This class is used to store the statistics of the park on a daily basis
- */
+@Getter
+@Setter
 public class StatisticDaily extends Statistic {
 
     private LocalDate date;

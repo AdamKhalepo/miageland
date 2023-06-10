@@ -25,6 +25,11 @@ public class TicketController {
     private final EmployeeService employeeService;
     private final VisitorService visitorService;
 
+    /**
+     * Allows the employee to validate the ticket of a visitor
+     * @param userEmail the email of the manager (set in user cookie)
+     * @param ticketId the id of the ticket to validate
+     */
     @PatchMapping( "employee/tickets/{ticketId}")
     public void patchTicketValidation(@PathVariable Long ticketId,
                                       @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
@@ -34,6 +39,13 @@ public class TicketController {
         this.ticketService.validateTicket(ticketId);
     }
 
+    /**
+     * Allows a visitor to create a ticket
+     * @param ticket the ticket to create
+     * @param visitorId the id of the visitor (set in path)
+     * @param userEmail the email of the visitor (set in user cookie)
+     * @return the {@link TicketDTO} created
+     */
     @PostMapping("visitors/{visitorId}/ticket")
     @ResponseStatus(HttpStatus.CREATED)
     public TicketDTO postTicket(@RequestBody Ticket ticket,
@@ -47,6 +59,12 @@ public class TicketController {
         return this.ticketService.createTicket(ticket, this.visitorService.getVisitorByEmail(userEmail));
     }
 
+    /**
+     * Allows a visitor to pay for a ticket
+     * @param ticketId the id of the ticket to pay
+     * @param visitorId the id of the visitor (set in path)
+     * @param userEmail the email of the visitor (set in user cookie)
+     */
     @PatchMapping("visitors/{visitorId}/tickets/{ticketId}/payment")
     public void patchTicketPayment(@PathVariable Long ticketId,
                                    @PathVariable Long visitorId,
@@ -59,6 +77,12 @@ public class TicketController {
         this.ticketService.buyTicket(ticketId, this.visitorService.getVisitorByEmail(userEmail));
     }
 
+    /**
+     * Allows an employee or a visitor to get all his tickets
+     * @param visitorId the id of the visitor (set in path)
+     * @param userEmail the email of the visitor (set in user cookie)
+     * @return a list of {@link TicketDTO}
+     */
     @GetMapping("/visitors/{visitorId}/tickets")
     public List<TicketDTO> getUserTickets(@PathVariable Long visitorId,
                                           @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
@@ -71,13 +95,19 @@ public class TicketController {
         return this.ticketService.getUserTickets(this.visitorService.getVisitorById(visitorId));
     }
 
+    /**
+     * Allows a visitor to cancel a ticket
+     * @param visitorId the id of the visitor (set in path)
+     * @param ticketId the id of the ticket to cancel
+     * @param userEmail the email of the visitor (set in user cookie)
+     * @return the {@link TicketDTO} canceled
+     */
     @PatchMapping("/visitors/{visitorId}/tickets/{ticketId}/cancel")
     public TicketDTO patchTicketCancelation(@PathVariable Long visitorId,
                              @PathVariable Long ticketId,
                              @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
-        //If the user is an employee OR if the user is a visitor and the visitorId is the same as the user's id
-        if (!employeeService.isEmployee(userEmail) &&
-                (!this.visitorService.isVisitor(userEmail) || !this.visitorService.isSameVisitor(userEmail, visitorId))) {
+        //If the user is a visitor and the visitorId is the same as the user's id
+        if (!this.visitorService.isVisitor(userEmail) || !this.visitorService.isSameVisitor(userEmail, visitorId)) {
             throw new IllegalAccessException("An error occured, try again later.");
         }
 

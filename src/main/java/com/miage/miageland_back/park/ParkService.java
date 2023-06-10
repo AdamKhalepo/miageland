@@ -14,6 +14,11 @@ public class ParkService {
 
     private final TicketRepository ticketRepository;
 
+    /**
+     * Get the statistics of a date
+     * @param date the date
+     * @return the {@link StatisticDaily}
+     */
     public StatisticDaily getStatisticsOfADate(LocalDate date) {
         StatisticDaily statistic = new StatisticDaily();
         double dailyRecipe = 0;
@@ -30,6 +35,11 @@ public class ParkService {
         return statistic;
     }
 
+    /**
+     * Update the gauge of the park
+     * @param gauge the new gauge to set
+     * @throws IllegalArgumentException if the gauge is lower than the max tickets in a day
+     */
     public void updateGauge(int gauge) {
         //Get the instance of the park (singleton)
         Park park = Park.getInstance();
@@ -41,6 +51,10 @@ public class ParkService {
         park.setGauge(gauge);
     }
 
+    /**
+     * Get the global statistics
+     * @return the {@link Statistic}
+     */
     public Statistic getGlobalStatistics() {
         Statistic statistic = new Statistic();
         statistic.setNbTicketsUsed(ticketRepository.countTicketsByState(TicketState.USED));

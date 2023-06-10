@@ -21,20 +21,41 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
+    /**
+     * Login the employee
+     * @param employee the employee to login (email must be set)
+     * @param response the response to set the cookie
+     */
     @GetMapping("/login")
     public void loginEmployee(@RequestBody Employee employee, HttpServletResponse response) {
+        if (!employeeService.isEmployee(employee.getEmail()))
+            throw new IllegalArgumentException("Incorrect user, try with another one.");
+
         this.employeeService.loginEmployee(employee.getEmail(),response);
     }
 
+    /**
+     * Create a new employee (you must be logged as a manager to call this endpoint)
+     * @param employee the employee to create
+     * @param managerEmail the email of the manager (set in the cookie)
+     * @return the created employee
+     * @throws IllegalAccessException if not logged as a manager
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EmployeeDTO postEmployee(@RequestBody Employee employee,
-                             @CookieValue(value = "user") Cookie managerCookie) throws IllegalAccessException {
-        if (!this.employeeService.isManager(managerCookie.getValue()))
+                             @CookieValue(value = "user") String managerEmail) throws IllegalAccessException {
+        if (!this.employeeService.isManager(managerEmail))
             throw new IllegalAccessException("You must be a manager to call this endpoint.");
         return this.employeeService.createEmployee(employee);
     }
 
+    /**
+     * Delete an employee (you must be logged as a manager to call this endpoint)
+     * @param employeeId the id of the employee to delete
+     * @param managerCookie the cookie of the manager (set in the cookie)
+     * @throws IllegalAccessException if not logged as a manager
+     */
     @DeleteMapping("/{employeeId}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteEmployee(@PathVariable Long employeeId,

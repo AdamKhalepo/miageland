@@ -17,6 +17,10 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final VisitorRepository visitorRepository;
 
+    /**
+     * Validate a ticket
+     * @param ticketId the id of the ticket to validate
+     */
     public void validateTicket(Long ticketId) {
         Ticket ticket = ticketRepository.findById(ticketId).
                 orElseThrow(() -> new EntityNotFoundException("Ticket with id : " + ticketId + " does not exist"));
@@ -29,6 +33,12 @@ public class TicketService {
         ticketRepository.save(ticket);
     }
 
+    /**
+     * Create a ticket
+     * @param ticket the ticket to create
+     * @param visitor the visitor who wants to create the ticket
+     * @return the created ticket
+     */
     public TicketDTO createTicket(Ticket ticket, Visitor visitor) {
         //we have to verify that the Visit date is before the current date.
         if (ticket.getVisitDate().isBefore(LocalDate.now()))
@@ -60,7 +70,11 @@ public class TicketService {
                 ticket.getState());
     }
 
-
+    /**
+     * Allow a visitor to buy a ticket
+     * @param id the id of the ticket to buy
+     * @param loggedVisitor the visitor who wants to buy the ticket
+     */
     public void buyTicket(Long id, Visitor loggedVisitor) {
         Ticket ticket = ticketRepository.findById(id).
                 orElseThrow(() -> new EntityNotFoundException("Ticket with id : " + id + " does not exist"));
@@ -72,6 +86,12 @@ public class TicketService {
         ticketRepository.save(ticket);
     }
 
+    /**
+     * Cancel a ticket
+     * @param visitorId the id of the visitor
+     * @param ticketId the id of the ticket to cancel
+     * @return the cancelled ticket
+     */
     public TicketDTO cancelTicket(Long visitorId, Long ticketId) {
         Ticket ticket = ticketRepository.findById(ticketId).
                 orElseThrow(() -> new EntityNotFoundException("Ticket with id : " + ticketId + " does not exist"));
@@ -94,6 +114,11 @@ public class TicketService {
                 ticket.getState());
     }
 
+    /**
+     * Get all the tickets of a visitor
+     * @param visitor the visitor
+     * @return the list of tickets
+     */
     public List<TicketDTO> getUserTickets(Visitor visitor) {
         return this.ticketRepository.findByVisitor(visitor).stream().map(ticket ->
                 new TicketDTO(ticket.getId(),

@@ -1,7 +1,11 @@
 package com.miage.miageland_back.ticket;
 
 import com.miage.miageland_back.users.visitor.Visitor;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,5 +32,4 @@ public class Ticket {
     private double price;
 
     private TicketState state;
-
 }

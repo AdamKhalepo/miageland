@@ -14,11 +14,21 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final CookieService cookieService;
 
+    /**
+     * Check if the employee has all the required fields
+     * @param employee the employee to check
+     * @return true if the employee has all the required fields, false otherwise
+     */
     private boolean missingFields(Employee employee) {
         return (employee.getEmail() == null || employee.getName() == null
                 || employee.getFirstName() == null || employee.getRole() == null);
     }
 
+    /**
+     * Create an employee
+     * @param newEmployee the employee to create
+     * @return the created employee
+     */
     public EmployeeDTO createEmployee(Employee newEmployee) {
         if (missingFields(newEmployee))
             throw new IllegalArgumentException("Missing parameters, please provide all parameters");
@@ -32,16 +42,23 @@ public class EmployeeService {
         }
     }
 
+    /**
+     * Login the employee
+     * @param employeeEmail the email of the employee to login
+     * @param response the response to set the cookie in the header
+     */
     public void loginEmployee(String employeeEmail, HttpServletResponse response) {
-        if (!this.employeeRepository.existsByEmail(employeeEmail))
-            throw new EntityNotFoundException("Employee does not exist");
-
         cookieService.deleteUserCookie(response);
         //Adding cookie to response to keep track of the employee
         //This cookie needs to be sent back to the server to identify the employee
         cookieService.addUserCookie(employeeEmail,response);
     }
 
+    /**
+     * Delete an employee
+     * @param employeeIdToDelete the id of the employee to delete
+     * @param userEmail the email of the user (set in the cookie)
+     */
     public void deleteEmployee(Long employeeIdToDelete, String userEmail) {
         if (!this.employeeRepository.existsById(employeeIdToDelete))
             throw new EntityNotFoundException("Employee does not exist.");

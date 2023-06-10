@@ -8,7 +8,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class EmployeeDTO {
+
     private Long id;
+
     private String email;
+
     private EmployeeRole role;
 }

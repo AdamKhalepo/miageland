@@ -17,30 +17,55 @@ public class VisitorService {
     private final TicketRepository ticketRepository;
     private final CookieService cookieService;
 
+    /**
+     * Log the user in by adding a cookie to the response
+     * @param visitorEmail the email of the visitor to log in
+     *
+     */
     public void loginVisitor(String visitorEmail, HttpServletResponse response) {
-        Visitor loggedVisitor = getVisitorByEmail(visitorEmail);
-
         //Resetting the cookie if it already exists
         this.cookieService.deleteUserCookie(response);
         //Adding cookie to response to keep track of the employee
         //This cookie needs to be sent back to the server to identify the employee
-        this.cookieService.addUserCookie(loggedVisitor.getEmail(), response);
+        this.cookieService.addUserCookie(visitorEmail, response);
     }
 
+    /**
+     * Get the visitor by his email
+     * @param visitorEmail the email of the visitor to get
+     * @return the visitor
+     * @throws EntityNotFoundException if the visitor does not exist
+     */
     public Visitor getVisitorByEmail(String visitorEmail) {
         return this.visitorRepository.findByEmail(visitorEmail)
                 .orElseThrow(() -> new EntityNotFoundException("Visitor does not exist"));
     }
 
+    /**
+     * Get the visitor by his id
+     * @param visitorId the id of the visitor to get
+     * @return the visitor
+     * @throws EntityNotFoundException if the visitor does not exist
+     */
     public Visitor getVisitorById(Long visitorId) {
         return this.visitorRepository.findById(visitorId)
                 .orElseThrow(() -> new EntityNotFoundException("Visitor does not exist"));
     }
 
-    public boolean isVisitor(String userCookie) {
-        return this.visitorRepository.existsByEmail(userCookie);
+    /**
+     * Check if the visitor exists
+     * @param email the email of the visitor to check
+     * @return true if the visitor exists, false otherwise
+     */
+    public boolean isVisitor(String email) {
+        return this.visitorRepository.existsByEmail(email);
     }
 
+    /**
+     * Get the visitor stats
+     * @param visitorId the id of the visitor to get the stats
+     * @return the {@link VisitorDTO} stats
+     */
     public VisitorDTO visitorsStats(Long visitorId) {
         Visitor visitor = getVisitorById(visitorId);
         return new VisitorDTO(
@@ -51,6 +76,10 @@ public class VisitorService {
         );
     }
 
+    /**
+     * Get the stats of all the visitors
+     * @return the list of {@link VisitorDTO} stats
+     */
     public List<VisitorDTO> allVisitorsStats() {
         return visitorRepository.findAll().stream().map(visitor -> new VisitorDTO(
                 visitor.getId(),
@@ -60,11 +89,18 @@ public class VisitorService {
         )).toList();
     }
 
+    /**
+     * Create a new visitor
+     * @param newVisitor the visitor to create
+     * @return the created visitor
+     * @throws IllegalArgumentException if the visitor is missing fields
+     * @throws EntityNotFoundException if the visitor already exists
+     */
     public Visitor createVisitor(Visitor newVisitor) {
         if (missingFields(newVisitor))
             throw new IllegalArgumentException("Missing parameters, please provide all parameters");
 
-        if (this.visitorRepository.existsByEmail(newVisitor.getEmail()))
+        if (this.isVisitor(newVisitor.getEmail()))
             throw new EntityNotFoundException("Visitor already exists");
 
         this.visitorRepository.save(newVisitor);
@@ -72,10 +108,21 @@ public class VisitorService {
         return newVisitor;
     }
 
+    /**
+     * Check if the visitor is missing fields
+     * @param newVisitor the visitor to check
+     * @return true if the visitor is missing fields, false otherwise
+     */
     private boolean missingFields(Visitor newVisitor) {
         return newVisitor.getEmail() == null || newVisitor.getName() == null || newVisitor.getFirstName() == null;
     }
 
+    /**
+     * Check if the visitor is the same as the one in the cookie
+     * @param userCookie the cookie of the visitor
+     * @param visitorId the id of the visitor to check
+     * @return true if the visitor is the same as the one in the cookie, false otherwise
+     */
     public boolean isSameVisitor(String userCookie, Long visitorId) {
         return this.visitorRepository.findById(visitorId).get().getEmail().equals(userCookie);
     }
