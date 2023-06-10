@@ -1,5 +1,6 @@
 package com.miage.miageland_back.users.visitor;
 
+import com.miage.miageland_back.ticket.Ticket;
 import com.miage.miageland_back.ticket.TicketRepository;
 import com.miage.miageland_back.ticket.TicketState;
 import com.miage.miageland_back.security.CookieService;
@@ -125,5 +126,15 @@ public class VisitorService {
      */
     public boolean isSameVisitor(String userCookie, Long visitorId) {
         return this.visitorRepository.findById(visitorId).get().getEmail().equals(userCookie);
+    }
+
+    /**
+     * Delete a visitor and also delete all his tickets
+     * @param visitorId the id of the visitor to delete
+     */
+    public void deleteVisitor(Long visitorId) {
+        List<Ticket> ticketsToDelete = this.ticketRepository.findByVisitor(this.visitorRepository.findById(visitorId).get());
+        this.ticketRepository.deleteAll(ticketsToDelete);
+        this.visitorRepository.deleteById(visitorId);
     }
 }

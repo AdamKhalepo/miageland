@@ -99,17 +99,19 @@ public class TicketController {
      * Allows a visitor to cancel a ticket
      * @param visitorId the id of the visitor (set in path)
      * @param ticketId the id of the ticket to cancel
-     * @param userEmail the email of the visitor (set in user cookie)
+     * @param visitorEmail the email of the visitor (set in user cookie)
      * @return the {@link TicketDTO} canceled
      */
     @PatchMapping("/visitors/{visitorId}/tickets/{ticketId}/cancel")
     public TicketDTO patchTicketCancelation(@PathVariable Long visitorId,
                              @PathVariable Long ticketId,
-                             @CookieValue(value = "user") String userEmail) throws IllegalAccessException {
-        //If the user is a visitor and the visitorId is the same as the user's id
-        if (!this.visitorService.isVisitor(userEmail) || !this.visitorService.isSameVisitor(userEmail, visitorId)) {
-            throw new IllegalAccessException("An error occured, try again later.");
-        }
+                             @CookieValue(value = "user") String visitorEmail) throws IllegalAccessException {
+
+        if (!this.visitorService.isVisitor(visitorEmail))
+            throw new IllegalAccessException("Log in as a visitor please.");
+
+        if (!this.visitorService.isSameVisitor(visitorEmail, visitorId))
+            throw new IllegalAccessException("The visitor email and the visitor id must be from the same visitor");
 
         return this.ticketService.cancelTicket(visitorId,ticketId);
     }
