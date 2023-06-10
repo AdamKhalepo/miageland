@@ -3,15 +3,19 @@ package com.miage.miageland_back.park;
 
 import lombok.Data;
 
-import java.time.LocalDate;
-
 @Data
+/**
+ * This class is used to store the statistics of the park
+ */
 public class Statistic {
-    int ticketsSoldperDay;
-    private LocalDate date;
-    private double dailyRecipe;
-    private int ticketsCancelled;
-    private int ticketsOnStandBy;
+
+    private int nbTicketsCancelled;
+
+    private int nbTicketsOnStandBy;
+
+    private int nbTicketsSold;
+
+    private int nbTicketsUsed;
 }
 
 

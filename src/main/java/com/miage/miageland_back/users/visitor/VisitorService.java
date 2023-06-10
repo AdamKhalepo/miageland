@@ -20,6 +20,7 @@ public class VisitorService {
     public void loginVisitor(String visitorEmail, HttpServletResponse response) {
         Visitor loggedVisitor = getVisitorByEmail(visitorEmail);
 
+        //Resetting the cookie if it already exists
         this.cookieService.deleteUserCookie(response);
         //Adding cookie to response to keep track of the employee
         //This cookie needs to be sent back to the server to identify the employee
@@ -40,22 +41,30 @@ public class VisitorService {
         return this.visitorRepository.existsByEmail(userCookie);
     }
 
-    public List<VisitorDTO> allVisitors(){
-        return visitorRepository.findAll().stream().map(visitor ->
-            new VisitorDTO(
-                    visitor.getId(),
-                    visitor.getName(),
-                    visitor.getFirstName(),
-                    ticketRepository.countTicketsByVisitorAndState(visitor, TicketState.USED)
-            )
-        ).toList();
+    public VisitorDTO visitorsStats(Long visitorId) {
+        Visitor visitor = getVisitorById(visitorId);
+        return new VisitorDTO(
+                visitor.getId(),
+                visitor.getName(),
+                visitor.getFirstName(),
+                ticketRepository.countTicketsByVisitorAndState(visitor, TicketState.USED)
+        );
+    }
+
+    public List<VisitorDTO> allVisitorsStats() {
+        return visitorRepository.findAll().stream().map(visitor -> new VisitorDTO(
+                visitor.getId(),
+                visitor.getName(),
+                visitor.getFirstName(),
+                ticketRepository.countTicketsByVisitorAndState(visitor, TicketState.USED)
+        )).toList();
     }
 
     public Visitor createVisitor(Visitor newVisitor) {
         if (missingFields(newVisitor))
             throw new IllegalArgumentException("Missing parameters, please provide all parameters");
 
-        if(this.visitorRepository.existsByEmail(newVisitor.getEmail()))
+        if (this.visitorRepository.existsByEmail(newVisitor.getEmail()))
             throw new EntityNotFoundException("Visitor already exists");
 
         this.visitorRepository.save(newVisitor);

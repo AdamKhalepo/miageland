@@ -14,8 +14,8 @@ public class ParkService {
 
     private final TicketRepository ticketRepository;
 
-    public Statistic getStatisticsOfaDate(LocalDate date) {
-        Statistic statistic = new Statistic();
+    public StatisticDaily getStatisticsOfADate(LocalDate date) {
+        StatisticDaily statistic = new StatisticDaily();
         double dailyRecipe = 0;
         for (Ticket ticket : ticketRepository.findByVisitDate(date)) {
             if (ticket.getState().equals(TicketState.VALID) || (ticket.getState().equals(TicketState.USED)))
@@ -23,9 +23,10 @@ public class ParkService {
         }
         statistic.setDate(date);
         statistic.setDailyRecipe(dailyRecipe);
-        statistic.setTicketsSoldperDay(ticketRepository.countTicketsByVisitDateAndState(date,TicketState.VALID));
-        statistic.setTicketsCancelled(ticketRepository.countTicketsByVisitDateAndState(date,TicketState.CANCELLED));
-        statistic.setTicketsOnStandBy(ticketRepository.countTicketsByVisitDateAndState(date,TicketState.PENDING_PAYMENT));
+        statistic.setNbTicketsUsed(ticketRepository.countTicketsByVisitDateAndState(date,TicketState.USED));
+        statistic.setNbTicketsSold(ticketRepository.countTicketsByVisitDateAndState(date,TicketState.VALID));
+        statistic.setNbTicketsCancelled(ticketRepository.countTicketsByVisitDateAndState(date,TicketState.CANCELLED));
+        statistic.setNbTicketsOnStandBy(ticketRepository.countTicketsByVisitDateAndState(date,TicketState.PENDING_PAYMENT));
         return statistic;
     }
 
@@ -38,5 +39,14 @@ public class ParkService {
                 throw new IllegalArgumentException("The gauge needs to be higher or equal than the max tickets in a day");
         }
         park.setGauge(gauge);
+    }
+
+    public Statistic getGlobalStatistics() {
+        Statistic statistic = new Statistic();
+        statistic.setNbTicketsUsed(ticketRepository.countTicketsByState(TicketState.USED));
+        statistic.setNbTicketsSold(ticketRepository.countTicketsByState(TicketState.VALID));
+        statistic.setNbTicketsCancelled(ticketRepository.countTicketsByState(TicketState.CANCELLED));
+        statistic.setNbTicketsOnStandBy(ticketRepository.countTicketsByState(TicketState.PENDING_PAYMENT));
+        return statistic;
     }
 }

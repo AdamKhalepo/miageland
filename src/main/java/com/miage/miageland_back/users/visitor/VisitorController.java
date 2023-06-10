@@ -33,11 +33,4 @@ public class VisitorController {
     public Visitor postVisitor(@RequestBody Visitor visitor) {
         return this.visitorService.createVisitor(visitor);
     }
-
-    @GetMapping("/visitors")
-    public List<VisitorDTO> getAllVisitor(@CookieValue(value = "user") Cookie userCookie) throws IllegalAccessException {
-        if (!this.employeeService.isManager(userCookie.getValue()))
-            throw new IllegalAccessException("You must be the manager to call this endpoint.");
-        return this.visitorService.allVisitors();
-    }
 }

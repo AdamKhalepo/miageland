@@ -17,5 +17,5 @@ public class VisitorDTO {
 
     private String lastName;
 
-    private int nbVisite;
+    private int nbVisit;
 }

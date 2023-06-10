@@ -17,9 +17,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     Integer countTicketsByVisitDateAndState(LocalDate date,TicketState ticketState);
 
-
-    Integer countTicketsByState(TicketState ticketState);
-
     List<Ticket> findByVisitDate(LocalDate date);
 
     @Query(value = "SELECT COALESCE(MAX(nb_visits_per_day),-1)" +
@@ -31,4 +28,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     Integer getMaxTicketsInAFutureDay();
 
     Integer countTicketsByVisitorAndState(Visitor visitor,TicketState ticketState);
+
+    int countTicketsByState(TicketState ticketState);
 }
