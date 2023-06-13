@@ -4,6 +4,7 @@ import com.miage.miageland_back.ticket.Ticket;
 import com.miage.miageland_back.ticket.TicketRepository;
 import com.miage.miageland_back.ticket.TicketState;
 import com.miage.miageland_back.security.CookieService;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -102,7 +103,7 @@ public class VisitorService {
             throw new IllegalArgumentException("Missing parameters, please provide all parameters");
 
         if (this.isVisitor(newVisitor.getEmail()))
-            throw new EntityNotFoundException("Visitor already exists");
+            throw new EntityExistsException("Visitor already exists");
 
         this.visitorRepository.save(newVisitor);
 

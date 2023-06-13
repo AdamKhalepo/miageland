@@ -1,6 +1,8 @@
 package com.miage.miageland_back.attraction;
 
 import com.miage.miageland_back.users.employee.EmployeeService;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -38,34 +41,58 @@ public class AttractionController {
 
     @GetMapping("/{attractionId}")
     public Attraction getAttraction(@PathVariable Long attractionId,
-                                    @CookieValue(value = "user") Cookie userCookie) throws IllegalAccessException {
-        if (!employeeService.isEmployee(userCookie.getValue()))
-            throw new IllegalAccessException("You must be an employee to call this endpoint.");
-        return attractionService.getAttraction(attractionId);
+                                    @CookieValue(value = "user") Cookie userCookie) {
+        try {
+            if (!employeeService.isEmployee(userCookie.getValue()))
+                throw new IllegalAccessException("You must be an employee to call this endpoint.");
+            return attractionService.getAttraction(attractionId);
+        } catch (IllegalAccessException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Attraction postAttraction(@RequestBody Attraction attraction,
-                                     @CookieValue(value = "user") Cookie userCookie) throws IllegalAccessException {
-        if (!employeeService.isManager(userCookie.getValue()) && !employeeService.isAdmin(userCookie.getValue()))
-            throw new IllegalAccessException("You must be an admin or manager to call this endpoint.");
-        return attractionService.createAttraction(attraction);
+                                     @CookieValue(value = "user") Cookie userCookie) {
+        try {
+            if (!employeeService.isManager(userCookie.getValue()) && !employeeService.isAdmin(userCookie.getValue()))
+                throw new IllegalAccessException("You must be an admin or manager to call this endpoint.");
+            return attractionService.createAttraction(attraction);
+        } catch (IllegalAccessException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        } catch (EntityExistsException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
     }
 
     @DeleteMapping("/{attractionId}")
     public void deleteAttraction(@PathVariable Long attractionId,
-                                 @CookieValue(value = "user") Cookie userCookie) throws IllegalAccessException {
-        if (!employeeService.isManager(userCookie.getValue()) && !employeeService.isAdmin(userCookie.getValue()))
-            throw new IllegalAccessException("You must be an admin or manager to call this endpoint.");
-        attractionService.deleteAttraction(attractionId);
+                                 @CookieValue(value = "user") Cookie userCookie) {
+        try {
+            if (!employeeService.isManager(userCookie.getValue()) && !employeeService.isAdmin(userCookie.getValue()))
+                throw new IllegalAccessException("You must be an admin or manager to call this endpoint.");
+            attractionService.deleteAttraction(attractionId);
+        } catch (IllegalAccessException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
     @PatchMapping("/{attractionId}")
     public AttractionDTO patchAttraction(@PathVariable Long attractionId,
-                                         @CookieValue(value = "user") Cookie userCookie) throws IllegalAccessException {
-        if (!employeeService.isManager(userCookie.getValue()) && !employeeService.isAdmin(userCookie.getValue()))
-            throw new IllegalAccessException("You must be an admin or manager to call this endpoint.");
-        return attractionService.changeAttractionStatus(attractionId);
+                                         @CookieValue(value = "user") Cookie userCookie) {
+        try {
+            if (!employeeService.isManager(userCookie.getValue()) && !employeeService.isAdmin(userCookie.getValue()))
+                throw new IllegalAccessException("You must be an admin or manager to call this endpoint.");
+            return attractionService.changeAttractionStatus(attractionId);
+        } catch (IllegalAccessException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 }

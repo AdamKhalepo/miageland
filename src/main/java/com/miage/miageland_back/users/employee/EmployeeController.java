@@ -1,5 +1,7 @@
 package com.miage.miageland_back.users.employee;
 
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("miageland/employees")
@@ -28,10 +31,14 @@ public class EmployeeController {
      */
     @GetMapping("/login")
     public void loginEmployee(@RequestBody Employee employee, HttpServletResponse response) {
-        if (!employeeService.isEmployee(employee.getEmail()))
-            throw new IllegalArgumentException("Incorrect user, try with another one.");
+        try {
+            if (!employeeService.isEmployee(employee.getEmail()))
+                throw new IllegalAccessException("Incorrect user, try with another one.");
 
-        this.employeeService.loginEmployee(employee.getEmail(),response);
+            this.employeeService.loginEmployee(employee.getEmail(), response);
+        } catch (IllegalAccessException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
     }
 
     /**
@@ -39,29 +46,39 @@ public class EmployeeController {
      * @param employee the employee to create
      * @param managerEmail the email of the manager (set in the cookie)
      * @return the created employee
-     * @throws IllegalAccessException if not logged as a manager
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public EmployeeDTO postEmployee(@RequestBody Employee employee,
-                             @CookieValue(value = "user") String managerEmail) throws IllegalAccessException {
-        if (!this.employeeService.isManager(managerEmail))
-            throw new IllegalAccessException("You must be a manager to call this endpoint.");
-        return this.employeeService.createEmployee(employee);
+                             @CookieValue(value = "user") String managerEmail) {
+        try {
+            if (!this.employeeService.isManager(managerEmail))
+                throw new IllegalAccessException("You must be a manager to call this endpoint.");
+            return this.employeeService.createEmployee(employee);
+        } catch (IllegalAccessException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        } catch (EntityExistsException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
     }
 
     /**
      * Delete an employee (you must be logged as a manager to call this endpoint)
      * @param employeeId the id of the employee to delete
      * @param managerCookie the cookie of the manager (set in the cookie)
-     * @throws IllegalAccessException if not logged as a manager
      */
     @DeleteMapping("/{employeeId}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteEmployee(@PathVariable Long employeeId,
-                               @CookieValue(value = "user") Cookie managerCookie) throws IllegalAccessException {
-        if (!this.employeeService.isManager(managerCookie.getValue()))
-            throw new IllegalAccessException("You must be a manager to call this endpoint.");
-        this.employeeService.deleteEmployee(employeeId,managerCookie.getValue());
+                               @CookieValue(value = "user") Cookie managerCookie) {
+        try {
+            if (!this.employeeService.isManager(managerCookie.getValue()))
+                throw new IllegalAccessException("You must be a manager to call this endpoint.");
+            this.employeeService.deleteEmployee(employeeId, managerCookie.getValue());
+        } catch (IllegalAccessException | IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 }
