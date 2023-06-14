@@ -16,6 +16,7 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final VisitorRepository visitorRepository;
+    private final Park park;
 
     /**
      * Validate a ticket
@@ -45,8 +46,8 @@ public class TicketService {
             throw new IllegalArgumentException("The visit date must be in the future");
 
         //we have to verify that the gauge of the park is not exceeded
-        if (Park.getInstance().getGauge() != null) {
-            if (ticketRepository.countTicketsByVisitDate(ticket.getVisitDate()) >= Park.getInstance().getGauge())
+        if (park.getGauge() != null) {
+            if (ticketRepository.countTicketsByVisitDate(ticket.getVisitDate()) >= park.getGauge())
                 throw new IllegalArgumentException("The gauge of the park is exceeded");
         }
 

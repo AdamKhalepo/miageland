@@ -28,10 +28,14 @@ public class AttractionController {
     private final EmployeeService employeeService;
 
     @GetMapping
-    public List<Attraction> getAttractions(@CookieValue(value = "user") Cookie userCookie) throws IllegalAccessException {
-        if (!employeeService.isEmployee(userCookie.getValue()))
-            throw new IllegalAccessException("You must be an employee to call this endpoint.");
-        return this.attractionService.getAttractions();
+    public List<Attraction> getAttractions(@CookieValue(value = "user") Cookie userCookie) {
+        try {
+            if (!employeeService.isEmployee(userCookie.getValue()))
+                throw new IllegalAccessException("You must be an employee to call this endpoint.");
+            return this.attractionService.getAttractions();
+        } catch (IllegalAccessException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        }
     }
 
     @GetMapping("/opened")

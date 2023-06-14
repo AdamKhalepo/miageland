@@ -13,6 +13,7 @@ import java.time.LocalDate;
 public class ParkService {
 
     private final TicketRepository ticketRepository;
+    private final Park park;
 
     /**
      * Get the statistics of a date
@@ -41,8 +42,6 @@ public class ParkService {
      * @throws IllegalArgumentException if the gauge is lower than the max tickets in a day
      */
     public void updateGauge(int gauge) {
-        //Get the instance of the park (singleton)
-        Park park = Park.getInstance();
         // -1 means that there is no ticket sold yet
         if (this.ticketRepository.getMaxTicketsInAFutureDay() != -1) {
             if (gauge < this.ticketRepository.getMaxTicketsInAFutureDay())

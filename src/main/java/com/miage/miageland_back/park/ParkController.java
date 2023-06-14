@@ -35,13 +35,18 @@ public class ParkController {
      * @param gauge the new limit of visitors in the park
      */
     @PatchMapping("/park/gauge/{gauge}")
-    public void patchAttraction(@CookieValue(value = "user") String userEmail,
-                                @PathVariable int gauge) throws IllegalAccessException {
-        //checking if the user is a manager
-        if (!this.employeeService.isManager(userEmail))
-            throw new IllegalAccessException("You must be a manager to call this endpoint.");
+    public void patchAttraction(@CookieValue(value = "user") String userEmail, @PathVariable int gauge) {
+        try {
+            //checking if the user is a manager
+            if (!this.employeeService.isManager(userEmail))
+                throw new IllegalAccessException("You must be a manager to call this endpoint.");
 
-        parkService.updateGauge(gauge);
+            parkService.updateGauge(gauge);
+        } catch (IllegalAccessException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     /**
