@@ -26,12 +26,13 @@ public class TicketService {
         Ticket ticket = ticketRepository.findById(ticketId).
                 orElseThrow(() -> new EntityNotFoundException("Ticket with id : " + ticketId + " does not exist"));
         //we have to verify that the Visit date is the current date.
-        if (ticket.getState() != TicketState.VALID && !ticket.getVisitDate().equals(LocalDate.now()))
-            throw new IllegalArgumentException("Ticket is not valid");
-
-        //since the ticket is valid, we can update its state to USED
-        ticket.setState(TicketState.USED);
-        ticketRepository.save(ticket);
+        if (ticket.getState() != TicketState.VALID || !ticket.getVisitDate().equals(LocalDate.now())) {
+            throw new IllegalArgumentException("Unable to validate this ticket. Please check the visit date and the state of the ticket.");
+        } else {
+            //since the ticket is valid, we can update its state to USED
+            ticket.setState(TicketState.USED);
+            ticketRepository.save(ticket);
+        }
     }
 
     /**
