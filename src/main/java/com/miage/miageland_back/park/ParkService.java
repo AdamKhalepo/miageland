@@ -25,7 +25,7 @@ public class ParkService {
         double dailyRecipe = 0;
         for (Ticket ticket : ticketRepository.findByVisitDate(date)) {
             if (ticket.getState().equals(TicketState.VALID) || (ticket.getState().equals(TicketState.USED)))
-                dailyRecipe = dailyRecipe + ticket.getPrice();
+                dailyRecipe += ticket.getPrice();
         }
         statistic.setDate(date);
         statistic.setDailyRecipe(dailyRecipe);
